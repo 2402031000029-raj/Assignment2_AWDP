@@ -1,0 +1,6 @@
+<?php require'inc.php';$err='';
+if($_POST){$d=$_POST;
+if(strlen(trim($d['name']))<2)$err='Enter your name';elseif(!filter_var($d['email'],FILTER_VALIDATE_EMAIL))$err='Invalid email';elseif(!preg_match('/^\d{10}$/',$d['mobile']))$err='Mobile must be 10 digits';elseif(strlen($d['password'])<6)$err='Password min 6 characters';elseif($d['password']!=$d['cpassword'])$err='Passwords do not match';
+elseif(row("SELECT id FROM users WHERE email=?",'s',$d['email']))$err='Email already registered';
+else{q("INSERT INTO users(name,email,mobile,password,address) VALUES(?,?,?,?,?)",'sssss',$d['name'],$d['email'],$d['mobile'],password_hash($d['password'],PASSWORD_DEFAULT),$d['address']);header('Location: login.php?ok=1');exit;}}
+head('Register');echo"<h2>Register</h2>".($err?"<div class=msg>$err</div>":"")."<form method=post>Name<input name=name required value='".v($_POST,'name')."'>Email<input name=email type=email required value='".v($_POST,'email')."'>Mobile<input name=mobile required value='".v($_POST,'mobile')."'>Password<input name=password type=password required>Confirm Password<input name=cpassword type=password required>Address<textarea name=address required>".v($_POST,'address')."</textarea><button>Register</button></form>";foot();
